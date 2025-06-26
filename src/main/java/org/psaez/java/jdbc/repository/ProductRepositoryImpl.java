@@ -33,11 +33,11 @@ public class ProductRepositoryImpl implements  Repository<Product> {
         Product product = null;
         try(PreparedStatement stmt = getConnection().prepareStatement("SELECT * from productos WHERE id= ?")){
             stmt.setLong(1, id);
-            ResultSet rs = stmt.executeQuery();
-            if(rs.next()){
-                product = createProduct(rs);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    product = createProduct(rs);
+                }
             }
-            rs.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -46,12 +46,38 @@ public class ProductRepositoryImpl implements  Repository<Product> {
 
     @Override
     public void insert(Product product) {
+        String sql;
+        if (product.getId() != null && product.getId() >0) {
+            sql = "UPDATE productos SET nombre = ?, precio = ? WHERE id = ?";
+        } else {
+            sql = "INSERT INTO productos(nombre, precio, fecha_registro) VALUES(?,?,?)";
+        }
+        try(PreparedStatement stmt = getConnection().prepareStatement(sql)){
+            stmt.setString(1,product.getNombre());
+            stmt.setLong(2,product.getPrecio());
+            if (product.getId() != null && product.getId() >0) {
+                stmt.setLong(3,product.getId());
+            }else{
+                stmt.setDate(3,new Date(product.getFechaRegistro().getTime()));
+            }
+            stmt.executeUpdate();
+
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
     @Override
     public void delete(Long id) {
-
+        String sql = "DELETE FROM productos WHERE id = ?";
+        try(PreparedStatement stmt = getConnection().prepareStatement(sql)){
+            stmt.setLong(1,id);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Product createProduct(ResultSet rs) throws SQLException {
