@@ -10,10 +10,16 @@ public class ConexionBD {
     private static String password = "root";
     private static Connection connection;
 
+    // Patrón Singleton, si cerrarmos la conexión en cada método del repositorio nos dará error
     public static Connection getInstance() throws SQLException {
         if(connection == null){
             connection = DriverManager.getConnection(url,username,password);
         }
         return connection;
+    }
+
+    // Crea una nueva conexión cada vez que se invoca
+    public static Connection getInstanceNoSingle() throws SQLException {
+        return connection = DriverManager.getConnection(url,username,password);
     }
 }

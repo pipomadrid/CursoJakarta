@@ -1,6 +1,7 @@
 package org.psaez.java.jdbc.models;
 
-import java.sql.Date;
+
+import java.util.Date;
 
 public class Product {
 
@@ -8,6 +9,7 @@ public class Product {
     private String nombre;
     private int precio;
     private Date fechaRegistro;
+    private Category category;
 
     public Product() {
     }
@@ -17,7 +19,8 @@ public class Product {
         return  id +
                 " | " + nombre +
                 " | " + precio +
-                " | "  + fechaRegistro ;
+                " | "  + fechaRegistro +
+                " | "  + category.getNombre();
     }
 
     public Product(Long id, String nombre, int precio, Date fechaRegistro) {
@@ -58,4 +61,8 @@ public class Product {
     public void setFechaRegistro(Date fechaRegistro) {
         this.fechaRegistro = fechaRegistro;
     }
+
+    public Category getCategory() { return category;}
+
+    public void setCategory(Category category) { this.category = category; }
 }

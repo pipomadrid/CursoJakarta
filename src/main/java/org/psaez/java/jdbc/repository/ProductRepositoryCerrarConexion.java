@@ -8,32 +8,36 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProductRepositoryImpl implements  Repository<Product> {
+// En esta clase obtenemos una conexión sin Singleton y abrrimos y cerramos una nueva conexión en cada método
+public class ProductRepositoryCerrarConexion  implements Repository<Product>{
+
     private Connection getConnection() throws SQLException {
-        return ConexionBD.getInstance();
+        return ConexionBD.getInstanceNoSingle();
     }
 
 
     @Override
     public List<Product> findAll() {
-         List<Product> products = new ArrayList<>();
-         try(Statement stmt = getConnection().createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT p.*,c.nombre as categoria from productos as p " +
-                     "inner join categorias as c ON (p.categoria_id = c.id)")){
-             while(rs.next()){
-                 Product product =  createProduct(rs);
-                 products.add(product);
-             }
-         } catch (SQLException e) {
-             throw new RuntimeException(e);
-         }
+        List<Product> products = new ArrayList<>();
+        try(Connection conn = getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT p.*,c.nombre as categoria from productos as p " +
+                    "inner join categorias as c ON (p.categoria_id = c.id)")){
+            while(rs.next()){
+                Product product =  createProduct(rs);
+                products.add(product);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         return products;
     }
 
     @Override
     public Product findById(Long id) {
         Product product = null;
-        try(PreparedStatement stmt = getConnection().prepareStatement("SELECT  p.*, c.nombre as categoria from productos as p " +
+        try(Connection conn = getConnection();
+            PreparedStatement stmt = conn.prepareStatement("SELECT  p.*, c.nombre as categoria from productos as p " +
                 "inner join categorias as c ON (p.categoria_id = c.id) WHERE p.id = ?")){
             stmt.setLong(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -55,7 +59,8 @@ public class ProductRepositoryImpl implements  Repository<Product> {
         } else {
             sql = "INSERT INTO productos(nombre, precio, categoria_id, fecha_registro) VALUES(?,?,?,?)";
         }
-        try(PreparedStatement stmt = getConnection().prepareStatement(sql)){
+        try(Connection conn = getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)){
             stmt.setString(1,product.getNombre());
             stmt.setLong(2,product.getPrecio());
             stmt.setLong(3,product.getCategory().getId());
@@ -76,7 +81,8 @@ public class ProductRepositoryImpl implements  Repository<Product> {
     @Override
     public void delete(Long id) {
         String sql = "DELETE FROM productos WHERE id = ?";
-        try(PreparedStatement stmt = getConnection().prepareStatement(sql)){
+        try(Connection conn = getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)){
             stmt.setLong(1,id);
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -96,4 +102,5 @@ public class ProductRepositoryImpl implements  Repository<Product> {
         product.setCategory(category);
         return product;
     }
+
 }
