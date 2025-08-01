@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // En esta clase obtenemos una conexión sin Singleton y abrrimos y cerramos una nueva conexión en cada método
-public class ProductRepositoryCerrarConexion  implements Repository<Product>{
+public class ProductRepositoryCerrarConexionImpl implements Repository<Product>{
 
     private Connection getConnection() throws SQLException {
         return ConexionBD.getInstanceNoSingle();

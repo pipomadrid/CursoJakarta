@@ -2,6 +2,7 @@ package org.psaez.java.jdbc;
 
 import org.psaez.java.jdbc.models.Category;
 import org.psaez.java.jdbc.models.Product;
+import org.psaez.java.jdbc.repository.ProductRepositoryCerrarConexionImpl;
 import org.psaez.java.jdbc.repository.ProductRepositoryImpl;
 import org.psaez.java.jdbc.repository.Repository;
 import org.psaez.java.jdbc.util.ConexionBD;
@@ -14,7 +15,7 @@ import java.util.List;
 public class EjemploJdbcRepositoryCerrarConexion {
     public static void main(String[] args) {
 
-        Repository<Product> repository = new ProductRepositoryImpl();
+        Repository<Product> repository = new ProductRepositoryCerrarConexionImpl();
         List<Product> products = repository.findAll();
         System.out.println("-------------------Find all-------------------");
         repository.findAll().forEach(System.out::println);
